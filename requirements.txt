@@ -1,4 +1,8 @@
-streamlit==1.35.0
-pandas==2.2.2
-fpdf2==2.8.5
-plotly==5.21.0
+@'
+Flask==3.0.0
+gunicorn==21.2.0
+requests==2.31.0
+beautifulsoup4==4.12.2
+pandas==2.2.2  # Eğer kullanıyorsan tut
+plotly==5.21.0  # Eğer kullanıyorsan tut
+'@ | Out-File -FilePath requirements.txt -Encoding UTF8
