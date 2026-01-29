@@ -3,6 +3,6 @@ Flask==3.0.0
 gunicorn==21.2.0
 requests==2.31.0
 beautifulsoup4==4.12.2
-pandas==2.2.2  # Eğer kullanıyorsan tut
-plotly==5.21.0  # Eğer kullanıyorsan tut
+pandas==2.2.2  
+plotly==5.21.0  
 '@ | Out-File -FilePath requirements.txt -Encoding UTF8
