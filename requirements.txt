@@ -1,8 +1,8 @@
-@'
-Flask==3.0.0
-gunicorn==21.2.0
+streamlit==1.28.1
+pandas==2.1.3
+numpy==1.24.3
 requests==2.31.0
 beautifulsoup4==4.12.2
-pandas==2.2.2  
-plotly==5.21.0  
-'@ | Out-File -FilePath requirements.txt -Encoding UTF8
+lxml==4.9.3
+python-dotenv==1.0.0
+pytz==2023.3
