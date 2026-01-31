@@ -1,31 +1,261 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-    <title>{{ title }}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Otomotiv Haber Takip</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        .haber-kart {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .haber-kart:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .kelime-badge {
+            font-size: 0.8rem;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .haber-resim {
+            height: 200px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .kaynak-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+        .haber-tarih {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .anahtar-listesi {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">🚗 {{ title }}</h1>
-        <div class="alert alert-success">
-            Flask uygulaması başarıyla çalışıyor!
-        </div>
-        <p>API Endpointleri:</p>
-        <ul>
-            <li><a href="/api/haberler" target="_blank">/api/haberler</a> - Haber JSON API</li>
-            <li><a href="/health" target="_blank">/health</a> - Sağlık kontrolü</li>
-        </ul>
-        <div class="mt-4">
-            <h5>Proje Özellikleri:</h5>
-            <ul>
-                <li>Flask 3.0.0</li>
-                <li>Python 3.11</li>
-                <li>Render deployment</li>
-                <li>REST API desteği</li>
-            </ul>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold"><i class="fas fa-car"></i> Otomotiv Haber Takip</h1>
+                    <p class="lead">Toyota, Tesla, BYD ve otomotiv sektöründen son 3 günün haberleri</p>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <span class="badge bg-light text-dark">🚗 Otomotiv</span>
+                        <span class="badge bg-light text-dark">🏁 Toyota</span>
+                        <span class="badge bg-light text-dark">⚡ Tesla</span>
+                        <span class="badge bg-light text-dark">🔋 BYD</span>
+                        <span class="badge bg-light text-dark">🔌 Elektrikli Araç</span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="card bg-dark bg-opacity-25 text-white">
+                        <div class="card-body">
+                            <h6><i class="fas fa-sync-alt"></i> Canlı Güncelleme</h6>
+                            <p class="mb-0" id="last-updated">Yükleniyor...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Anahtar Kelimeler -->
+        <div class="anahtar-listesi">
+            <h5><i class="fas fa-search"></i> Takip Edilen Anahtar Kelimeler:</h5>
+            <div id="anahtar-kelimeler" class="d-flex flex-wrap gap-2">
+                <!-- JavaScript ile doldurulacak -->
+            </div>
+        </div>
+
+        <!-- Haberler -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4"><i class="far fa-newspaper"></i> Son Haberler</h3>
+                <div id="loading" class="loading">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                    <p class="mt-2">Hürriyet'ten haberler yükleniyor...</p>
+                </div>
+                <div id="haberler-container" class="row">
+                    <!-- JavaScript ile doldurulacak -->
+                </div>
+                <div id="no-haberler" class="alert alert-warning d-none">
+                    <i class="fas fa-exclamation-triangle"></i> Şu anda haber bulunamadı.
+                </div>
+            </div>
+        </div>
+
+        <!-- API Bilgisi -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-code"></i> API Endpoint'leri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>📰 Tüm Haberler</h6>
+                                <code>/api/haberler</code>
+                                <p class="small text-muted mt-1">Tüm anahtar kelimeler için haberleri getirir</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>🔍 Özel Arama</h6>
+                                <code>/api/ara?kelime=tesla</code>
+                                <p class="small text-muted mt-1">Belirli bir kelime için haber ara</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>❤️ Sağlık Kontrolü</h6>
+                                <code>/health</code>
+                                <p class="small text-muted mt-1">API durumunu kontrol et</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-5 pt-4 border-top">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Otomotiv Haber Takip</h6>
+                    <p class="text-muted small">Hürriyet gazetesinden otomotiv sektörü haberlerini otomatik olarak toplar.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="text-muted small">
+                        <i class="fas fa-code-branch"></i> v2.0 | 
+                        <i class="fas fa-server"></i> Render | 
+                        <i class="fab fa-github"></i> GitHub
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Haberleri yükle
+        async function loadHaberler() {
+            try {
+                const response = await fetch('/api/haberler');
+                const data = await response.json();
+                
+                // Güncelleme zamanını göster
+                document.getElementById('last-updated').textContent = 
+                    `Son güncelleme: ${data.last_updated || 'Yeni'}`;
+                
+                // Anahtar kelimeleri göster
+                const anahtarDiv = document.getElementById('anahtar-kelimeler');
+                if (data.anahtar_kelimeler) {
+                    anahtarDiv.innerHTML = data.anahtar_kelimeler.map(kelime => 
+                        `<span class="badge bg-primary kelime-badge">${kelime}</span>`
+                    ).join('');
+                }
+                
+                // Loading'i gizle
+                document.getElementById('loading').classList.add('d-none');
+                
+                // Haberleri göster
+                const container = document.getElementById('haberler-container');
+                const noHaberDiv = document.getElementById('no-haberler');
+                
+                if (data.haberler && data.haberler.length > 0) {
+                    noHaberDiv.classList.add('d-none');
+                    container.innerHTML = '';
+                    
+                    data.haberler.forEach(haber => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 col-lg-4';
+                        
+                        // Resim URL'sini kontrol et
+                        const resimUrl = haber.resim && haber.resim.startsWith('http') 
+                            ? haber.resim 
+                            : 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                        
+                        col.innerHTML = `
+                            <div class="card haber-kart">
+                                ${haber.resim ? `
+                                <div class="position-relative">
+                                    <img src="${resimUrl}" class="haber-resim" alt="${haber.baslik}">
+                                    <span class="badge bg-danger kaynak-badge">${haber.kaynak}</span>
+                                </div>
+                                ` : ''}
+                                <div class="card-body">
+                                    <span class="badge bg-info kelime-badge">${haber.anahtar_kelime}</span>
+                                    <h5 class="card-title">${haber.baslik}</h5>
+                                    <p class="card-text haber-tarih">
+                                        <i class="far fa-calendar-alt"></i> ${haber.tarih} 
+                                        ${haber.tarih_text ? `(${haber.tarih_text})` : ''}
+                                    </p>
+                                    <p class="card-text">${haber.ozet || ''}</p>
+                                    <a href="${haber.link}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-external-link-alt"></i> Haberi Oku
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(col);
+                    });
+                } else {
+                    container.innerHTML = '';
+                    noHaberDiv.classList.remove('d-none');
+                }
+                
+            } catch (error) {
+                console.error('Haber yükleme hatası:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Haberler yüklenirken hata oluştu.
+                        <button onclick="loadHaberler()" class="btn btn-sm btn-outline-danger mt-2">Tekrar Dene</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Sayfa yüklendiğinde haberleri çek
+        document.addEventListener('DOMContentLoaded', loadHaberler);
+        
+        // Her 60 saniyede bir otomatik güncelle
+        setInterval(loadHaberler, 60000);
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
