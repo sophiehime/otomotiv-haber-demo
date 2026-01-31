@@ -1,66 +1,94 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🚗 Otomotiv Haber Takip</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-top: 0;
         }
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
             padding: 3rem 0;
             margin-bottom: 2rem;
-            border-radius: 0 0 20px 20px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        .haber-kart {
-            transition: transform 0.3s, box-shadow 0.3s;
+        .news-card {
             border: none;
-            border-radius: 12px;
+            border-radius: 15px;
             overflow: hidden;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            height: 100%;
         }
-        .haber-kart:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
         }
-        .kelime-badge {
-            font-size: 0.8rem;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-        .haber-resim {
+        .news-img {
             height: 200px;
             object-fit: cover;
             width: 100%;
         }
-        .kaynak-badge {
+        .keyword-badge {
+            font-size: 0.75rem;
+            margin-right: 5px;
+            margin-bottom: 8px;
+        }
+        .source-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
         }
-        .loading {
-            text-align: center;
-            padding: 2rem;
+        .news-date {
+            font-size: 0.85rem;
             color: #6c757d;
         }
-        .haber-tarih {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        .anahtar-listesi {
+        .keyword-list {
             background: white;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #2575fc;
+        }
+        .btn-read {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-read:hover {
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+        .api-card {
+            border-left: 4px solid #28a745;
+            transition: all 0.3s;
+        }
+        .api-card:hover {
+            transform: translateX(5px);
+        }
+        footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            margin-top: 50px;
+            padding: 30px 0;
         }
     </style>
 </head>
@@ -69,22 +97,23 @@
     <div class="hero">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="display-5 fw-bold"><i class="fas fa-car"></i> Otomotiv Haber Takip</h1>
-                    <p class="lead">Toyota, Tesla, BYD ve otomotiv sektöründen son 3 günün haberleri</p>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                        <span class="badge bg-light text-dark">🚗 Otomotiv</span>
-                        <span class="badge bg-light text-dark">🏁 Toyota</span>
-                        <span class="badge bg-light text-dark">⚡ Tesla</span>
-                        <span class="badge bg-light text-dark">🔋 BYD</span>
-                        <span class="badge bg-light text-dark">🔌 Elektrikli Araç</span>
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3"><i class="fas fa-car me-3"></i>Otomotiv Haber Takip</h1>
+                    <p class="lead mb-4">Toyota, Tesla, BYD ve otomotiv sektöründen son 3 günün haberleri</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-car me-1"></i> Otomotiv</span>
+                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-industry me-1"></i> Toyota</span>
+                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-bolt me-1"></i> Tesla</span>
+                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-charging-station me-1"></i> BYD</span>
+                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-leaf me-1"></i> Elektrikli Araç</span>
                     </div>
                 </div>
-                <div class="col-md-4 text-end">
-                    <div class="card bg-dark bg-opacity-25 text-white">
-                        <div class="card-body">
-                            <h6><i class="fas fa-sync-alt"></i> Canlı Güncelleme</h6>
-                            <p class="mb-0" id="last-updated">Yükleniyor...</p>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="card bg-white bg-opacity-25 border-0">
+                        <div class="card-body text-white">
+                            <h5><i class="fas fa-sync-alt me-2"></i>Canlı Güncelleme</h5>
+                            <p class="mb-0 fs-5" id="last-updated">Yükleniyor...</p>
+                            <small><i class="fas fa-database me-1"></i> Hürriyet Gazetesi</small>
                         </div>
                     </div>
                 </div>
@@ -94,98 +123,124 @@
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Anahtar Kelimeler -->
-        <div class="anahtar-listesi">
-            <h5><i class="fas fa-search"></i> Takip Edilen Anahtar Kelimeler:</h5>
-            <div id="anahtar-kelimeler" class="d-flex flex-wrap gap-2">
-                <!-- JavaScript ile doldurulacak -->
+        <!-- Keywords -->
+        <div class="keyword-list">
+            <h4 class="mb-3"><i class="fas fa-search me-2"></i>Takip Edilen Anahtar Kelimeler</h4>
+            <div id="keywords-container" class="d-flex flex-wrap gap-2">
+                <!-- JS ile doldurulacak -->
             </div>
         </div>
 
-        <!-- Haberler -->
-        <div class="row">
+        <!-- News Section -->
+        <div class="row mb-5">
             <div class="col-12">
-                <h3 class="mb-4"><i class="far fa-newspaper"></i> Son Haberler</h3>
-                <div id="loading" class="loading">
-                    <div class="spinner-border text-primary" role="status">
+                <h2 class="mb-4"><i class="far fa-newspaper me-2"></i>Son Haberler</h2>
+                
+                <!-- Loading -->
+                <div id="loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Yükleniyor...</span>
                     </div>
-                    <p class="mt-2">Hürriyet'ten haberler yükleniyor...</p>
+                    <p class="mt-3 fs-5 text-muted">Hürriyet'ten haberler yükleniyor...</p>
                 </div>
-                <div id="haberler-container" class="row">
-                    <!-- JavaScript ile doldurulacak -->
+                
+                <!-- News Container -->
+                <div id="news-container" class="row">
+                    <!-- JS ile doldurulacak -->
                 </div>
-                <div id="no-haberler" class="alert alert-warning d-none">
-                    <i class="fas fa-exclamation-triangle"></i> Şu anda haber bulunamadı.
+                
+                <!-- No News -->
+                <div id="no-news" class="alert alert-warning text-center py-4 d-none">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <h4>Henüz haber bulunamadı</h4>
+                    <p>Lütfen daha sonra tekrar deneyin veya farklı bir anahtar kelime arayın.</p>
                 </div>
             </div>
         </div>
 
-        <!-- API Bilgisi -->
-        <div class="row mt-5">
+        <!-- API Section -->
+        <div class="row mb-5">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="fas fa-code"></i> API Endpoint'leri</h5>
+                <h2 class="mb-4"><i class="fas fa-code me-2"></i>API Endpoint'leri</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card api-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary"><i class="fas fa-newspaper me-2"></i>Tüm Haberler</h5>
+                                <code class="d-block mb-3 p-2 bg-light rounded">/api/haberler</code>
+                                <p class="card-text">Tüm anahtar kelimeler için son 3 günün haberlerini JSON formatında getirir.</p>
+                                <a href="/api/haberler" target="_blank" class="btn btn-outline-primary">Test Et</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <h6>📰 Tüm Haberler</h6>
-                                <code>/api/haberler</code>
-                                <p class="small text-muted mt-1">Tüm anahtar kelimeler için haberleri getirir</p>
+                    <div class="col-md-4">
+                        <div class="card api-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-success"><i class="fas fa-search me-2"></i>Özel Arama</h5>
+                                <code class="d-block mb-3 p-2 bg-light rounded">/api/ara?kelime=tesla</code>
+                                <p class="card-text">Belirli bir anahtar kelime için haber arama yapar.</p>
+                                <a href="/api/ara?kelime=tesla" target="_blank" class="btn btn-outline-success">Test Et</a>
                             </div>
-                            <div class="col-md-4">
-                                <h6>🔍 Özel Arama</h6>
-                                <code>/api/ara?kelime=tesla</code>
-                                <p class="small text-muted mt-1">Belirli bir kelime için haber ara</p>
-                            </div>
-                            <div class="col-md-4">
-                                <h6>❤️ Sağlık Kontrolü</h6>
-                                <code>/health</code>
-                                <p class="small text-muted mt-1">API durumunu kontrol et</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card api-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger"><i class="fas fa-heartbeat me-2"></i>Sağlık Kontrolü</h5>
+                                <code class="d-block mb-3 p-2 bg-light rounded">/health</code>
+                                <p class="card-text">API'nin çalışma durumunu ve sistem bilgilerini gösterir.</p>
+                                <a href="/health" target="_blank" class="btn btn-outline-danger">Test Et</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Footer -->
-        <footer class="mt-5 pt-4 border-top">
+    <!-- Footer -->
+    <footer>
+        <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h6>Otomotiv Haber Takip</h6>
-                    <p class="text-muted small">Hürriyet gazetesinden otomotiv sektörü haberlerini otomatik olarak toplar.</p>
-                </div>
-                <div class="col-md-6 text-end">
+                    <h5>Otomotiv Haber Takip</h5>
+                    <p class="text-muted">Hürriyet gazetesinden otomotiv sektörü haberlerini otomatik olarak toplar ve sunar.</p>
                     <p class="text-muted small">
-                        <i class="fas fa-code-branch"></i> v2.0 | 
-                        <i class="fas fa-server"></i> Render | 
-                        <i class="fab fa-github"></i> GitHub
+                        <i class="fas fa-code me-1"></i> Flask 3.0.0 | 
+                        <i class="fas fa-server me-1"></i> Render | 
+                        <i class="fab fa-python me-1"></i> Python 3.11
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted small">
+                        <i class="fas fa-sync-alt me-1"></i> Son güncelleme: <span id="footer-updated">-</span><br>
+                        <i class="fas fa-database me-1"></i> Kaynak: Hürriyet Gazetesi<br>
+                        <i class="fab fa-github me-1"></i> 
+                        <a href="https://github.com/sophiehime/otomotiv-haber-demo" target="_blank" class="text-decoration-none">GitHub Repository</a>
                     </p>
                 </div>
             </div>
-        </footer>
-    </div>
+        </div>
+    </footer>
 
     <!-- JavaScript -->
     <script>
         // Haberleri yükle
-        async function loadHaberler() {
+        async function loadNews() {
             try {
                 const response = await fetch('/api/haberler');
                 const data = await response.json();
                 
-                // Güncelleme zamanını göster
-                document.getElementById('last-updated').textContent = 
-                    `Son güncelleme: ${data.last_updated || 'Yeni'}`;
+                // Güncelleme zamanı
+                const now = new Date().toLocaleTimeString('tr-TR');
+                document.getElementById('last-updated').textContent = `Son güncelleme: ${now}`;
+                document.getElementById('footer-updated').textContent = now;
                 
-                // Anahtar kelimeleri göster
-                const anahtarDiv = document.getElementById('anahtar-kelimeler');
+                // Anahtar kelimeler
+                const keywordsContainer = document.getElementById('keywords-container');
                 if (data.anahtar_kelimeler) {
-                    anahtarDiv.innerHTML = data.anahtar_kelimeler.map(kelime => 
-                        `<span class="badge bg-primary kelime-badge">${kelime}</span>`
+                    keywordsContainer.innerHTML = data.anahtar_kelimeler.map(keyword => 
+                        `<span class="badge bg-primary keyword-badge p-2">${keyword}</span>`
                     ).join('');
                 }
                 
@@ -193,40 +248,40 @@
                 document.getElementById('loading').classList.add('d-none');
                 
                 // Haberleri göster
-                const container = document.getElementById('haberler-container');
-                const noHaberDiv = document.getElementById('no-haberler');
+                const container = document.getElementById('news-container');
+                const noNews = document.getElementById('no-news');
                 
                 if (data.haberler && data.haberler.length > 0) {
-                    noHaberDiv.classList.add('d-none');
+                    noNews.classList.add('d-none');
                     container.innerHTML = '';
                     
-                    data.haberler.forEach(haber => {
+                    data.haberler.forEach(news => {
                         const col = document.createElement('div');
-                        col.className = 'col-md-6 col-lg-4';
+                        col.className = 'col-lg-4 col-md-6';
                         
-                        // Resim URL'sini kontrol et
-                        const resimUrl = haber.resim && haber.resim.startsWith('http') 
-                            ? haber.resim 
-                            : 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                        // Varsayılan resim
+                        const defaultImage = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                        const imageUrl = news.resim && news.resim.startsWith('http') ? news.resim : defaultImage;
                         
                         col.innerHTML = `
-                            <div class="card haber-kart">
-                                ${haber.resim ? `
+                            <div class="card news-card">
                                 <div class="position-relative">
-                                    <img src="${resimUrl}" class="haber-resim" alt="${haber.baslik}">
-                                    <span class="badge bg-danger kaynak-badge">${haber.kaynak}</span>
+                                    <img src="${imageUrl}" class="news-img" alt="${news.baslik}" onerror="this.src='${defaultImage}'">
+                                    <span class="badge bg-danger source-badge">${news.kaynak}</span>
                                 </div>
-                                ` : ''}
                                 <div class="card-body">
-                                    <span class="badge bg-info kelime-badge">${haber.anahtar_kelime}</span>
-                                    <h5 class="card-title">${haber.baslik}</h5>
-                                    <p class="card-text haber-tarih">
-                                        <i class="far fa-calendar-alt"></i> ${haber.tarih} 
-                                        ${haber.tarih_text ? `(${haber.tarih_text})` : ''}
+                                    <div class="mb-2">
+                                        <span class="badge bg-info keyword-badge">${news.anahtar_kelime}</span>
+                                        <span class="badge bg-secondary keyword-badge">${news.tarih}</span>
+                                    </div>
+                                    <h5 class="card-title">${news.baslik}</h5>
+                                    <p class="card-text news-date">
+                                        <i class="far fa-calendar-alt me-1"></i> ${news.tarih} 
+                                        ${news.tarih_text ? `<small>(${news.tarih_text})</small>` : ''}
                                     </p>
-                                    <p class="card-text">${haber.ozet || ''}</p>
-                                    <a href="${haber.link}" target="_blank" class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-external-link-alt"></i> Haberi Oku
+                                    <p class="card-text">${news.ozet || 'Habere ait özet bulunmuyor.'}</p>
+                                    <a href="${news.link}" target="_blank" class="btn btn-read">
+                                        <i class="fas fa-external-link-alt me-1"></i> Haberi Oku
                                     </a>
                                 </div>
                             </div>
@@ -235,27 +290,38 @@
                     });
                 } else {
                     container.innerHTML = '';
-                    noHaberDiv.classList.remove('d-none');
+                    noNews.classList.remove('d-none');
                 }
                 
             } catch (error) {
-                console.error('Haber yükleme hatası:', error);
+                console.error('Hata:', error);
                 document.getElementById('loading').innerHTML = `
                     <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle"></i> Haberler yüklenirken hata oluştu.
-                        <button onclick="loadHaberler()" class="btn btn-sm btn-outline-danger mt-2">Tekrar Dene</button>
+                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                        <h4>Haberler yüklenirken hata oluştu</h4>
+                        <p>${error.message}</p>
+                        <button onclick="loadNews()" class="btn btn-outline-danger mt-2">Tekrar Dene</button>
                     </div>
                 `;
             }
         }
         
-        // Sayfa yüklendiğinde haberleri çek
-        document.addEventListener('DOMContentLoaded', loadHaberler);
+        // Sayfa yüklendiğinde çalıştır
+        document.addEventListener('DOMContentLoaded', loadNews);
         
-        // Her 60 saniyede bir otomatik güncelle
-        setInterval(loadHaberler, 60000);
+        // Her 2 dakikada bir güncelle
+        setInterval(loadNews, 120000);
+        
+        // Linklerin yeni sekmede açılmasını sağla
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('http')) {
+                e.target.setAttribute('target', '_blank');
+                e.target.setAttribute('rel', 'noopener noreferrer');
+            }
+        });
     </script>
     
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
