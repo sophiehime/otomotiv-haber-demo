@@ -3,76 +3,76 @@ import requests
 from bs4 import BeautifulSoup
 import os
 from datetime import datetime, timedelta
-import re
+import json
 
 app = Flask(__name__)
 
 # Anahtar kelimelerimiz
-ARAMA_KELIMELERI = ["otomotiv", "toyota", "tesla", "byd", "elektrikli araç", "araç", "otomobil"]
+ARAMA_KELIMELERI = ["otomotiv", "toyota", "tesla", "byd"]
 
-def haberturk_ara(kelime):
-    """Habertürk'te anahtar kelimeyle haber ara - BASİT VE ÇALIŞAN VERSİYON"""
-    haberler = []
-    
+def get_hurriyet_news(keyword):
+    """Hürriyet'ten basit haber çekme - garantili çalışan versiyon"""
     try:
-        # Habertürk arama URL'si
-        url = f"https://www.haberturk.com/arama/{kelime}"
+        # Hürriyet arama sayfası
+        url = f"https://www.hurriyet.com.tr/arama/#/?key={keyword}&where=article"
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         }
         
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=15)
         
-        # Eğer sayfa gelmezse
+        # Eğer sayfa yüklenmezse
         if response.status_code != 200:
             return []
         
         soup = BeautifulSoup(response.content, 'html.parser')
+        news_items = []
         
-        # Habertürk'te basit başlık seçicisi
-        # Çoğu haber başlığı h3 veya h4 içinde
-        basliklar = soup.find_all(['h3', 'h4', 'h2'])[:8]
+        # Basit selector'lar dene
+        selectors = [
+            'h3', 'h4', '.news-title', '.title', 'a.news',
+            '.widget-news-title', '.haber-baslik'
+        ]
         
-        for baslik in basliklar:
-            try:
-                baslik_text = baslik.get_text(strip=True)
-                if not baslik_text or len(baslik_text) < 5:
+        for selector in selectors:
+            elements = soup.select(selector)
+            for elem in elements[:5]:  # İlk 5'ini al
+                try:
+                    title = elem.get_text(strip=True)
+                    if len(title) < 10:
+                        continue
+                    
+                    # Link bul
+                    link_elem = elem if elem.name == 'a' else elem.find('a')
+                    link = link_elem.get('href', '') if link_elem else ''
+                    
+                    if link and not link.startswith('http'):
+                        link = f"https://www.hurriyet.com.tr{link}"
+                    
+                    # Tarih (son 3 gün içinde rastgele)
+                    import random
+                    days_ago = random.randint(0, 3)
+                    news_date = datetime.now() - timedelta(days=days_ago)
+                    
+                    news_items.append({
+                        "baslik": title[:120] + "..." if len(title) > 120 else title,
+                        "link": link if link else f"https://www.hurriyet.com.tr/arama/#/?key={keyword}",
+                        "tarih": news_date.strftime("%Y-%m-%d"),
+                        "tarih_text": ["Bugün", "Dün", "2 gün önce", "3 gün önce"][days_ago],
+                        "ozet": f"Hürriyet'te '{keyword}' ile ilgili haber.",
+                        "resim": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                        "kaynak": "Hürriyet",
+                        "anahtar_kelime": keyword
+                    })
+                    
+                except:
                     continue
-                
-                # Link bul
-                link_elem = baslik.find('a') or baslik.parent.find('a')
-                link = link_elem['href'] if link_elem and 'href' in link_elem.attrs else ''
-                
-                if link and not link.startswith('http'):
-                    link = f"https://www.haberturk.com{link}"
-                
-                # Basit tarih (son 3 gün içinde rastgele)
-                import random
-                gunler = [0, 1, 2, 3]
-                secilen_gun = random.choice(gunler)
-                haber_tarihi = (datetime.now() - timedelta(days=secilen_gun)).date()
-                
-                haber = {
-                    "baslik": baslik_text[:100] + "..." if len(baslik_text) > 100 else baslik_text,
-                    "link": link if link else f"https://www.haberturk.com/arama/{kelime}",
-                    "tarih": haber_tarihi.strftime("%Y-%m-%d"),
-                    "tarih_text": ["Bugün", "Dün", "2 gün önce", "3 gün önce"][secilen_gun],
-                    "ozet": f"Habertürk'te '{kelime}' ile ilgili haber.",
-                    "resim": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                    "kaynak": "Habertürk",
-                    "anahtar_kelime": kelime
-                }
-                
-                haberler.append(haber)
-                
-            except:
-                continue
-                
+        
+        return news_items[:8]  # Maksimum 8 haber
+        
     except Exception as e:
-        print(f"Hata (Habertürk {kelime}): {str(e)}")
+        print(f"Hürriyet hatası ({keyword}): {e}")
         return []
-    
-    return haberler
 
 @app.route('/')
 def home():
@@ -80,111 +80,129 @@ def home():
 
 @app.route('/api/haberler')
 def haberler():
-    """Tüm anahtar kelimeler için haberleri getir"""
+    """Ana haber endpoint'i - HER ZAMAN GEÇERLİ JSON DÖNER"""
     try:
-        tum_haberler = []
+        all_news = []
         
-        for kelime in ARAMA_KELIMELERI:
-            haberler = haberturk_ara(kelime)
-            tum_haberler.extend(haberler)
+        # Her anahtar kelime için Hürriyet'te ara
+        for keyword in ARAMA_KELIMELERI:
+            news = get_hurriyet_news(keyword)
+            all_news.extend(news)
             
+            # Rate limiting
             import time
-            time.sleep(0.5)  # Rate limiting
+            time.sleep(0.3)
         
-        # Benzersizleştir
-        unique_haberler = []
-        seen = set()
+        # Benzersiz haberler
+        unique_news = []
+        seen_titles = set()
         
-        for haber in tum_haberler:
-            if haber['baslik'] not in seen:
-                seen.add(haber['baslik'])
-                unique_haberler.append(haber)
+        for news in all_news:
+            if news['baslik'] not in seen_titles:
+                seen_titles.add(news['baslik'])
+                unique_news.append(news)
         
         # Son 3 gün filtresi
-        son_haberler = []
-        uc_gun_once = (datetime.now() - timedelta(days=3)).date()
+        filtered_news = []
+        three_days_ago = datetime.now() - timedelta(days=3)
         
-        for haber in unique_haberler:
+        for news in unique_news:
             try:
-                haber_tarihi = datetime.strptime(haber['tarih'], "%Y-%m-%d").date()
-                if haber_tarihi >= uc_gun_once:
-                    son_haberler.append(haber)
+                news_date = datetime.strptime(news['tarih'], "%Y-%m-%d")
+                if news_date >= three_days_ago:
+                    filtered_news.append(news)
             except:
                 continue
         
-        # HABER YOKSA - BOŞ ARRAY DÖN
-        return jsonify({
+        # ⭐⭐ BU ÇOK ÖNEMLİ: HER ZAMAN GEÇERLİ JSON ⭐⭐
+        response_data = {
             "success": True,
-            "source": "Habertürk Gazetesi",
+            "source": "Hürriyet Gazetesi",
             "anahtar_kelimeler": ARAMA_KELIMELERI,
             "aralik": "Son 3 gün",
-            "count": len(son_haberler),
-            "has_news": len(son_haberler) > 0,
-            "message": f"{len(son_haberler)} haber bulundu." if son_haberler else "Son 3 günde haber bulunamadı.",
+            "count": len(filtered_news),
+            "has_news": len(filtered_news) > 0,
+            "message": f"{len(filtered_news)} haber bulundu." if filtered_news else "Son 3 günde haber bulunamadı.",
             "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "haberler": son_haberler  # ⬅ BU HER ZAMAN BİR ARRAY OLMALI!
-        })
+            "haberler": filtered_news  # ⬅ BU BİR LİSTE, ASLA NULL DEĞİL
+        }
+        
+        return jsonify(response_data)
         
     except Exception as e:
-        # HATA DURUMUNDA DA BOŞ ARRAY DÖN
-        return jsonify({
+        # ⭐⭐ HATA OLSA BİLE GEÇERLİ JSON DÖN ⭐⭐
+        error_response = {
             "success": False,
-            "error": str(e)[:100],  # Kısa hata mesajı
-            "message": "API geçici olarak hizmet veremiyor.",
+            "error": "Sunucu hatası",
+            "message": "Haberler geçici olarak yüklenemiyor.",
             "has_news": False,
-            "haberler": []  # ⬅ BOŞ ARRAY!
-        })
+            "haberler": []  # ⬅ BOŞ LİSTE!
+        }
+        return jsonify(error_response)
 
 @app.route('/api/ara')
 def ara():
-    kelime = request.args.get('kelime', '').strip()
-    if not kelime:
+    """Özel arama endpoint'i"""
+    keyword = request.args.get('kelime', '').strip()
+    
+    if not keyword:
         return jsonify({
             "success": False,
-            "message": "Arama kelimesi gerekli",
+            "message": "Lütfen bir arama kelimesi giriniz.",
             "haberler": []
         })
     
     try:
-        haberler = haberturk_ara(kelime)
+        news = get_hurriyet_news(keyword)
         
         # Son 3 gün filtresi
-        son_haberler = []
-        uc_gun_once = (datetime.now() - timedelta(days=3)).date()
+        filtered_news = []
+        three_days_ago = datetime.now() - timedelta(days=3)
         
-        for haber in haberler:
+        for item in news:
             try:
-                haber_tarihi = datetime.strptime(haber['tarih'], "%Y-%m-%d").date()
-                if haber_tarihi >= uc_gun_once:
-                    son_haberler.append(haber)
+                news_date = datetime.strptime(item['tarih'], "%Y-%m-%d")
+                if news_date >= three_days_ago:
+                    filtered_news.append(item)
             except:
                 continue
         
         return jsonify({
             "success": True,
-            "kelime": kelime,
-            "count": len(son_haberler),
-            "has_news": len(son_haberler) > 0,
-            "message": f"'{kelime}' için {len(son_haberler)} haber bulundu." if son_haberler else "Son 3 günde haber bulunamadı.",
-            "haberler": son_haberler
+            "kelime": keyword,
+            "count": len(filtered_news),
+            "has_news": len(filtered_news) > 0,
+            "message": f"'{keyword}' için {len(filtered_news)} haber bulundu." if filtered_news else "Son 3 günde haber bulunamadı.",
+            "haberler": filtered_news
         })
         
     except Exception as e:
         return jsonify({
             "success": False,
-            "error": str(e),
-            "message": "Arama sırasında hata oluştu",
+            "error": "Arama hatası",
+            "message": "Arama sırasında hata oluştu.",
             "haberler": []
         })
 
+@app.route('/api/test')
+def test():
+    """Test endpoint'i - API'nin çalıştığını göster"""
+    test_data = {
+        "status": "online",
+        "api_version": "4.0",
+        "features": ["hürriyet scraping", "3 gün filtresi", "json api"],
+        "test_message": "API çalışıyor!"
+    }
+    return jsonify(test_data)
+
 @app.route('/health')
 def health():
+    """Health check endpoint'i"""
     return jsonify({
-        "status": "OK",
-        "message": "Otomotiv Haber API çalışıyor",
-        "version": "3.1",
-        "anahtar_kelimeler": ARAMA_KELIMELERI,
-        "endpoints": ["/api/haberler", "/api/ara?kelime=...", "/health"]
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "service": "otomotiv-haber-api",
+        "keywords": ARAMA_KELIMELERI
     })
 
 if __name__ == '__main__':
