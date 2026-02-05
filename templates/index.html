@@ -1,327 +1,181 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚗 Otomotiv Haber Takip</title>
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>Otomotiv Haber Takip</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 0;
+        .haber-karti {
+            transition: transform 0.2s;
+            margin-bottom: 20px;
         }
-        .hero {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 25px 25px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .haber-karti:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        .news-card {
-            border: none;
-            border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-            height: 100%;
-        }
-        .news-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        .news-img {
-            height: 200px;
-            object-fit: cover;
-            width: 100%;
-        }
-        .keyword-badge {
-            font-size: 0.75rem;
-            margin-right: 5px;
-            margin-bottom: 8px;
-        }
-        .source-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 10;
-        }
-        .news-date {
-            font-size: 0.85rem;
-            color: #6c757d;
-        }
-        .keyword-list {
-            background: white;
+        .anahtar-kelime {
+            background-color: #e9ecef;
+            padding: 3px 8px;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-            border-left: 5px solid #2575fc;
-        }
-        .btn-read {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            border: none;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        .btn-read:hover {
-            transform: scale(1.05);
-            color: white;
-            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
-        }
-        .api-card {
-            border-left: 4px solid #28a745;
-            transition: all 0.3s;
-        }
-        .api-card:hover {
-            transform: translateX(5px);
-        }
-        footer {
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            margin-top: 50px;
-            padding: 30px 0;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <div class="hero">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold mb-3"><i class="fas fa-car me-3"></i>Otomotiv Haber Takip</h1>
-                    <p class="lead mb-4">Toyota, Tesla, BYD ve otomotiv sektöründen son 3 günün haberleri</p>
-                    <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-car me-1"></i> Otomotiv</span>
-                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-industry me-1"></i> Toyota</span>
-                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-bolt me-1"></i> Tesla</span>
-                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-charging-station me-1"></i> BYD</span>
-                        <span class="badge bg-light text-dark fs-6 p-2"><i class="fas fa-leaf me-1"></i> Elektrikli Araç</span>
-                    </div>
+            <a class="navbar-brand" href="/">🏎️ Otomotiv Haber Takip</a>
+            <div class="text-white">
+                <span id="haber-sayisi">0 haber</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2>Son Otomotiv Haberleri</h2>
+                <p class="text-muted">Hürriyet'ten anlık otomotiv haberleri</p>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <input type="text" id="arama-kutusu" class="form-control" placeholder="Kelime ara...">
+                    <button id="ara-butonu" class="btn btn-primary">Ara</button>
                 </div>
-                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                    <div class="card bg-white bg-opacity-25 border-0">
-                        <div class="card-body text-white">
-                            <h5><i class="fas fa-sync-alt me-2"></i>Canlı Güncelleme</h5>
-                            <p class="mb-0 fs-5" id="last-updated">Yükleniyor...</p>
-                            <small><i class="fas fa-database me-1"></i> Hürriyet Gazetesi</small>
-                        </div>
-                    </div>
+            </div>
+        </div>
+
+        <div class="row" id="haberler-container">
+            <!-- Haberler buraya JavaScript ile eklenecek -->
+            <div class="col-12 text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Yükleniyor...</span>
+                </div>
+                <p>Haberler yükleniyor...</p>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h5>📊 İstatistikler</h5>
+                    <p>Son güncelleme: <span id="guncelleme-tarihi">-</span></p>
+                    <p>Takip edilen anahtar kelimeler: 
+                        <span class="anahtar-kelime me-1">otomotiv</span>
+                        <span class="anahtar-kelime me-1">toyota</span>
+                        <span class="anahtar-kelime me-1">tesla</span>
+                        <span class="anahtar-kelime">byd</span>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Keywords -->
-        <div class="keyword-list">
-            <h4 class="mb-3"><i class="fas fa-search me-2"></i>Takip Edilen Anahtar Kelimeler</h4>
-            <div id="keywords-container" class="d-flex flex-wrap gap-2">
-                <!-- JS ile doldurulacak -->
-            </div>
-        </div>
-
-        <!-- News Section -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2 class="mb-4"><i class="far fa-newspaper me-2"></i>Son Haberler</h2>
-                
-                <!-- Loading -->
-                <div id="loading" class="text-center py-5">
-                    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                        <span class="visually-hidden">Yükleniyor...</span>
-                    </div>
-                    <p class="mt-3 fs-5 text-muted">Hürriyet'ten haberler yükleniyor...</p>
-                </div>
-                
-                <!-- News Container -->
-                <div id="news-container" class="row">
-                    <!-- JS ile doldurulacak -->
-                </div>
-                
-                <!-- No News -->
-                <div id="no-news" class="alert alert-warning text-center py-4 d-none">
-                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                    <h4>Henüz haber bulunamadı</h4>
-                    <p>Lütfen daha sonra tekrar deneyin veya farklı bir anahtar kelime arayın.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- API Section -->
-        <div class="row mb-5">
-            <div class="col-12">
-                <h2 class="mb-4"><i class="fas fa-code me-2"></i>API Endpoint'leri</h2>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="card api-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary"><i class="fas fa-newspaper me-2"></i>Tüm Haberler</h5>
-                                <code class="d-block mb-3 p-2 bg-light rounded">/api/haberler</code>
-                                <p class="card-text">Tüm anahtar kelimeler için son 3 günün haberlerini JSON formatında getirir.</p>
-                                <a href="/api/haberler" target="_blank" class="btn btn-outline-primary">Test Et</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card api-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title text-success"><i class="fas fa-search me-2"></i>Özel Arama</h5>
-                                <code class="d-block mb-3 p-2 bg-light rounded">/api/ara?kelime=tesla</code>
-                                <p class="card-text">Belirli bir anahtar kelime için haber arama yapar.</p>
-                                <a href="/api/ara?kelime=tesla" target="_blank" class="btn btn-outline-success">Test Et</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card api-card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title text-danger"><i class="fas fa-heartbeat me-2"></i>Sağlık Kontrolü</h5>
-                                <code class="d-block mb-3 p-2 bg-light rounded">/health</code>
-                                <p class="card-text">API'nin çalışma durumunu ve sistem bilgilerini gösterir.</p>
-                                <a href="/health" target="_blank" class="btn btn-outline-danger">Test Et</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Otomotiv Haber Takip</h5>
-                    <p class="text-muted">Hürriyet gazetesinden otomotiv sektörü haberlerini otomatik olarak toplar ve sunar.</p>
-                    <p class="text-muted small">
-                        <i class="fas fa-code me-1"></i> Flask 3.0.0 | 
-                        <i class="fas fa-server me-1"></i> Render | 
-                        <i class="fab fa-python me-1"></i> Python 3.11
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="text-muted small">
-                        <i class="fas fa-sync-alt me-1"></i> Son güncelleme: <span id="footer-updated">-</span><br>
-                        <i class="fas fa-database me-1"></i> Kaynak: Hürriyet Gazetesi<br>
-                        <i class="fab fa-github me-1"></i> 
-                        <a href="https://github.com/sophiehime/otomotiv-haber-demo" target="_blank" class="text-decoration-none">GitHub Repository</a>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
     <script>
         // Haberleri yükle
-        async function loadNews() {
+        async function haberleriYukle() {
             try {
                 const response = await fetch('/api/haberler');
                 const data = await response.json();
                 
-                // Güncelleme zamanı
-                const now = new Date().toLocaleTimeString('tr-TR');
-                document.getElementById('last-updated').textContent = `Son güncelleme: ${now}`;
-                document.getElementById('footer-updated').textContent = now;
-                
-                // Anahtar kelimeler
-                const keywordsContainer = document.getElementById('keywords-container');
-                if (data.anahtar_kelimeler) {
-                    keywordsContainer.innerHTML = data.anahtar_kelimeler.map(keyword => 
-                        `<span class="badge bg-primary keyword-badge p-2">${keyword}</span>`
-                    ).join('');
-                }
-                
-                // Loading'i gizle
-                document.getElementById('loading').classList.add('d-none');
-                
-                // Haberleri göster
-                const container = document.getElementById('news-container');
-                const noNews = document.getElementById('no-news');
-                
-                if (data.haberler && data.haberler.length > 0) {
-                    noNews.classList.add('d-none');
-                    container.innerHTML = '';
-                    
-                    data.haberler.forEach(news => {
-                        const col = document.createElement('div');
-                        col.className = 'col-lg-4 col-md-6';
-                        
-                        // Varsayılan resim
-                        const defaultImage = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
-                        const imageUrl = news.resim && news.resim.startsWith('http') ? news.resim : defaultImage;
-                        
-                        col.innerHTML = `
-                            <div class="card news-card">
-                                <div class="position-relative">
-                                    <img src="${imageUrl}" class="news-img" alt="${news.baslik}" onerror="this.src='${defaultImage}'">
-                                    <span class="badge bg-danger source-badge">${news.kaynak}</span>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-2">
-                                        <span class="badge bg-info keyword-badge">${news.anahtar_kelime}</span>
-                                        <span class="badge bg-secondary keyword-badge">${news.tarih}</span>
-                                    </div>
-                                    <h5 class="card-title">${news.baslik}</h5>
-                                    <p class="card-text news-date">
-                                        <i class="far fa-calendar-alt me-1"></i> ${news.tarih} 
-                                        ${news.tarih_text ? `<small>(${news.tarih_text})</small>` : ''}
-                                    </p>
-                                    <p class="card-text">${news.ozet || 'Habere ait özet bulunmuyor.'}</p>
-                                    <a href="${news.link}" target="_blank" class="btn btn-read">
-                                        <i class="fas fa-external-link-alt me-1"></i> Haberi Oku
-                                    </a>
-                                </div>
-                            </div>
-                        `;
-                        container.appendChild(col);
-                    });
+                if (data.success && data.has_news) {
+                    haberleriGoster(data.haberler);
+                    document.getElementById('haber-sayisi').textContent = `${data.count} haber`;
+                    document.getElementById('guncelleme-tarihi').textContent = data.last_updated;
                 } else {
-                    container.innerHTML = '';
-                    noNews.classList.remove('d-none');
+                    document.getElementById('haberler-container').innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <h4>🤔 Haber Bulunamadı</h4>
+                                <p>${data.message || 'Son 3 gün içinde haber bulunamadı.'}</p>
+                            </div>
+                        </div>
+                    `;
                 }
-                
             } catch (error) {
                 console.error('Hata:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
-                        <h4>Haberler yüklenirken hata oluştu</h4>
-                        <p>${error.message}</p>
-                        <button onclick="loadNews()" class="btn btn-outline-danger mt-2">Tekrar Dene</button>
+                document.getElementById('haberler-container').innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <h4>⚠️ Hata Oluştu</h4>
+                            <p>Haberler yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.</p>
+                        </div>
                     </div>
                 `;
             }
         }
-        
-        // Sayfa yüklendiğinde çalıştır
-        document.addEventListener('DOMContentLoaded', loadNews);
-        
-        // Her 2 dakikada bir güncelle
-        setInterval(loadNews, 120000);
-        
-        // Linklerin yeni sekmede açılmasını sağla
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('http')) {
-                e.target.setAttribute('target', '_blank');
-                e.target.setAttribute('rel', 'noopener noreferrer');
+
+        // Haberleri ekranda göster
+        function haberleriGoster(haberler) {
+            const container = document.getElementById('haberler-container');
+            let html = '';
+            
+            haberler.forEach(haber => {
+                html += `
+                <div class="col-md-6 col-lg-4">
+                    <div class="card haber-karti h-100">
+                        <img src="${haber.resim}" class="card-img-top" alt="${haber.baslik}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary">${haber.kaynak}</span>
+                                <small class="text-muted">${haber.tarih_text}</small>
+                            </div>
+                            <h5 class="card-title">${haber.baslik}</h5>
+                            <p class="card-text">${haber.ozet}</p>
+                            <div class="mt-2">
+                                <span class="anahtar-kelime">${haber.anahtar_kelime}</span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <a href="${haber.link}" target="_blank" class="btn btn-sm btn-primary">Habere Git →</a>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Arama işlevi
+        document.getElementById('ara-butonu').addEventListener('click', async () => {
+            const kelime = document.getElementById('arama-kutusu').value.trim();
+            if (!kelime) return;
+            
+            try {
+                const response = await fetch(`/api/ara?kelime=${encodeURIComponent(kelime)}`);
+                const data = await response.json();
+                
+                if (data.success && data.has_news) {
+                    haberleriGoster(data.haberler);
+                } else {
+                    document.getElementById('haberler-container').innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-warning">
+                                <h4>🔍 Arama Sonucu</h4>
+                                <p>${data.message}</p>
+                                <button onclick="haberleriYukle()" class="btn btn-sm btn-outline-primary">Tüm Haberlere Dön</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Arama hatası:', error);
             }
         });
+
+        // Enter tuşu ile arama
+        document.getElementById('arama-kutusu').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('ara-butonu').click();
+            }
+        });
+
+        // Sayfa yüklendiğinde haberleri getir
+        document.addEventListener('DOMContentLoaded', haberleriYukle);
     </script>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
